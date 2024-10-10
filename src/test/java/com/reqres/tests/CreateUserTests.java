@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.Test;
 
+import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.hamcrest.Matchers.equalTo;
@@ -14,11 +15,12 @@ public class CreateUserTests {
     // simple test to create a user and validate json response fields directly
     @Test
     public void testCreateUser() {
-        // defining base urI from api
+        // defining base URI from API
         RestAssured.baseURI = "https://reqres.in/api/";
 
-        // creating a user with post request
-        Response response = RestAssured.given()
+        // creating a user with POST request
+        Response response = given()  // Use the given() method for the request
+                .log().all()  // Log the request details
                 .contentType(ContentType.JSON)
                 .body("{ \"name\": \"Lucas\", \"job\": \"QA\" }") // requisition body
                 .post("users");
@@ -27,18 +29,22 @@ public class CreateUserTests {
         response.then().statusCode(201); // 201 indicates resource was created
 
         // validating response body
-        response.then().body("name", equalTo("Lucas")); //verify if the returned name is "Lucas"
-        response.then().body("job", equalTo("QA")); // verify if returned profession is "QA"
+        response.then().body("name", equalTo("Lucas")); // verify if the returned name is "Lucas"
+        response.then().body("job", equalTo("QA")); // verify if the returned profession is "QA"
+
+        // Log the response details
+        response.then().log().all();  // Log the response details
     }
 
-    //  validating fields and status code
+    // validating fields and status code
     @Test
     public void testCreateUserValidateFields() {
-        // defining base urI from api
+        // defining base URI from API
         RestAssured.baseURI = "https://reqres.in/api/";
 
-        // send post requisition to create a user
-        Response response = RestAssured.given()
+        // send POST requisition to create a user
+        Response response = given()  // Use the given() method for the request
+                .log().all()  // Log the request details
                 .contentType(ContentType.JSON)
                 .body("{ \"name\": \"Lucas\", \"job\": \"QA\" }") // requisition body
                 .post("users");
@@ -49,10 +55,12 @@ public class CreateUserTests {
         // validating obligatory fields in response (name and job)
         response.then().body("name", equalTo("Lucas"));
         response.then().body("job", equalTo("QA"));
+
+        // Log the response details
+        response.then().log().all();  // Log the response details
     }
 
-    // pojo class to map api response
-    // static to avoid instantiation errors
+    // POJO class to map API response
     public static class UserResponse {
         private String name;
         private String job;
@@ -73,22 +81,24 @@ public class CreateUserTests {
         public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
     }
 
-    // test with pojo to extract and validate response
+    // test with POJO to extract and validate response
     @Test
     public void testCreateUserWithPOJO() {
-        // defining base urI from api
+        // defining base URI from API
         RestAssured.baseURI = "https://reqres.in/api/";
 
-        // sending post request to create a user
-        UserResponse user = RestAssured.given()
+        // sending POST request to create a user
+        UserResponse user = given()  // Use the given() method for the request
+                .log().all()  // Log the request details
                 .contentType(ContentType.JSON)
                 .body("{ \"name\": \"Lucas\", \"job\": \"QA\" }") // requisition body
                 .post("users")
                 .then()
+                .log().all()  // Log the response details
                 .statusCode(201)  // status code validation
                 .extract().as(UserResponse.class); // extract response to a UserResponse object
 
-        // validate pojo fields
+        // validate POJO fields
         assertEquals("Lucas", user.getName());
         assertEquals("QA", user.getJob());
         assertNotNull(user.getId());  // the field id must not be null
